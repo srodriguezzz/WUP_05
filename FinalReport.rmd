@@ -21,9 +21,18 @@ A new  preventative aides drug (triUmpsal) is under test in clinical trials. Con
 
 <!--Decide on your methods:  use "variable analysis" or other appropriate descriptors.  Make sure to choose at least one graphical method and at least one numerical method. Discuss what data manipulations may be needed for example subsetting or other binning procedures and what sort of graphical displays and inferential tools will be used!-->
 
+We chose the categorical~categorical method because all the data is organized in categories.
+
 # Results
 
 <!--Divide this section into two sub-sections:  One for your descriptive  results and one for your inferential results.!-->
+
+```{r}
+WomanData=filter(triUmp,gender=="F")
+head(WomanData)
+```
+
+These are the data for all the females in the study.
 
 ## Descriptive Results
 
@@ -31,15 +40,55 @@ A new  preventative aides drug (triUmpsal) is under test in clinical trials. Con
 
 <!--Graphical results here.  Make sure to show your code.  Provide appropriate labels for axes, giving units if possible, and provide a good title for the graph, too.  Use the graphical results to describe the patterns if any that exist in the data as focused toward the research question. Bottom line is to explain the features of the graph that are relevant to conforming or departing to what is expected by your null hypothesis !-->
 
+```{r}
+barchartGC(~infected + treatment,data=WomanData)
+barchartGC(~infected + treatment,data=WomanData, type="percent")
+
+```
+
+This box plot shows that those who got the vaccine were more susceptible to contracting aids than those who didn't
+
+```{r}
+dd2 <- WomanData %>% group_by(infected,treatment) %>% summarize(count=n()) %>% mutate(prcnt=count/sum(count))
+
+
+basicC <- ggplot(dd2,aes(x=infected,y=count,fill=treatment))
+basicC + geom_bar(stat="identity",position="dodge")
+
+
+basicCC <- ggplot(dd2,aes(x=infected,y=prcnt*100,fill=treatment)) 
+basicCC + geom_bar(stat="identity", position = "dodge")
+```
+
+This box plot shows that out of the woman who got aids, most of them had taken the vaccine beforehand.
+
 ### Numerical Descriptive Results
 
 <!--Numerical results go here. Use the numerical results to describe the patterns if any that exist in the data as focused toward the research question!-->
+
+```{r}
+table1 <- xtabs(~infected + treatment, data=WomanData)
+rowPerc(table1)
+colPerc(table1)
+```
+
+This table shows that most of the woman who contracted aids had gotten the vaccine beforehand.
 
 ## Inferential Results
 
 <!--State hypothesis clearly.  Make sure your discussion of the inferential test covers all the aspects that the test output produces, such as test statistic, p-value etc.  Make a decision about the null hypothesis, explain the assumptions on which the selected test/procedure was based, and why the chosen procedure satisfys the assumptions and is appropriate to answer the research question!-->
 
+```{r}
+chisq.test(table1)
+chisqtestGC(table1)
+fisher.test(table1)
+```
+
+3 tests were ran and the results of the tests show that all the P values were far too low to accept the Null hypothesis. Therefore, we reject the Null hypothesis. 
 
 # Discussion and Conclusion
 
 <!--Discussion and conclusion here.  If you found a relationship be sure to consider whether the relationship occurs because one of the variavbles causes the other, or whether they perhasps are related for some other reason.  Watch the chapter 6 videos from the GeorgeTown videos collection.!-->
+
+The results showed us that the odds ratio of contracting aids after getting the vaccine in woman was 1.543902:1. The results concluded that there is a significant difference in the percent of woman who took the vaccine and those who took the placebo. Therefore, we reject the null hypothesis. 
+
